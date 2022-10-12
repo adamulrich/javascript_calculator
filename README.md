@@ -6,7 +6,7 @@ Design
 A calculator requires two operands and an operator to compute a result. In our standard notation implemention you enter digits, decimal point and a negative sign. After
 you enter digits, then you enter an operator, followed by more digits, then another operator or equals.
 
-In this implementation, I've chosen a state based model to understand on where we are at in the process. 
+In this implementation, I've chosen a state based model to understand where we are at in the process. 
 1. Entering the first operand
 2. Selected an operator
 3. Entering the second operand
@@ -14,9 +14,10 @@ In this implementation, I've chosen a state based model to understand on where w
 
 If you choose another operator instead of equals, or after equals, you will go back to state 2. 
 
-If you select clear it will clear the current operand back to zero. 
+If you select clear it will clear the current operand back to zero, but you should remain in the same state.
+When you do a clear operation while in state 2 and state 4, it will be a no-op.
 
-If you select clear all, it will clear all operands and the result and operator.
+If you select clear all, it will clear all operands and the result and operator, and set you back to state 1.
 
 #event model
 We will hook up events from the UI buttons and keystrokes to 3 entry point methods

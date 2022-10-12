@@ -205,17 +205,19 @@ function clearPressed(clearInput) {
 
             //Reset state depending on current state
             switch (calc.currentState) {
-                case STATE_OPERAND_1:
+                case STATE_OPERAND_1: 
+                case STATE_OPERATOR: 
+                case STATE_EQUALS:
                     // reset the buffer
-                    calc.displayBuffer = "0";
-
-                case STATE_OPERATOR:
-                    calc.currentOperator = 0;
+                    resetState();
+                    break;
 
                 case STATE_OPERAND_2:
                     // reset the buffer
                     calc.displayBuffer = "0";
-
+                    calc.currentOperand2_value = 0;
+                    calc.currentState = STATE_OPERATOR;
+                    break;
             }
         }
     } else if (clearInput === BACKSPACE) {
@@ -246,7 +248,7 @@ function clearPressed(clearInput) {
 // reset the state of our object and UI to default
 function resetState() {
     calc.currentOperator = 0;
-    calc.currentState = 1;
+    calc.currentState = STATE_OPERAND_1;
     calc.currentOperand1_value = 0;
     calc.currentOperand2_value = 0;
     calc.currentResult = 0;
