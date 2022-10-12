@@ -1,0 +1,91 @@
+body {
+    justify-content: center;
+    align-content: center;
+    align-self: center;
+}
+
+main {
+    width: 400px;
+    height: 400px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 2fr;
+}
+
+.input_button, .operator_button, .control_button {
+    height: 50px;
+    width: 50px;
+    margin: 5px;
+    border-radius: 0.5em;
+    font-size: x-large;
+    font-weight: bolder;
+    background-color: antiquewhite;
+}
+
+.input_button:hover, 
+.operator_button:hover, 
+.control_button:hover { 
+    background-color: aqua;
+
+}
+
+/* .input_button:focus , 
+.operator_button:focus, 
+.control_button:focus {
+    
+    background-color: antiquewhite;
+} */
+
+.input_button:active , 
+.operator_button:active, 
+.control_button:active {
+    background-color: rgb(72, 139, 142);
+}
+
+#display {
+    height: 50px;
+    margin: 5px;
+    background-color: aqua;
+    border: 2px solid black;
+    border-radius: 0.5em;
+    font-size: 34px;
+    text-align: right;
+    padding: 15px;
+    grid-column: 1/5;
+}
+
+.computation {
+    margin: 15px;
+    width: 200px;
+    height: 30px;
+    border: 2px solid black;
+    background-color: aquamarine;
+    border-radius: 0.5em;
+    font-size: 30px;
+    padding-bottom: 4px;
+    padding-right: 10px;
+    text-align: right;
+}
+
+#operator {
+    border: 2px solid black;
+    margin: 15px;
+    justify-self: right;
+    width: 50px;
+    height: 30px;
+    background-color: aquamarine;
+}
+
+.divider {
+    height:2px;
+    margin-top: 30px;
+    justify-self: center;
+    width: 80%;
+    background-color: black;
+}
+
+button#focus_object {
+    height: 0px;
+    width: 0px;
+    margin-left: -100px;
+}
+
