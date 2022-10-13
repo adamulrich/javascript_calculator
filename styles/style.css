@@ -12,9 +12,9 @@ main {
 }
 
 .input_button, .operator_button, .control_button {
-    height: 50px;
-    width: 50px;
-    margin: 5px;
+    height: 65px;
+    width: 65px;
+    margin: 2px;
     border-radius: 0.5em;
     font-size: x-large;
     font-weight: bolder;
