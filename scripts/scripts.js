@@ -76,36 +76,42 @@ function inputButtonPressed(inputData) {
 
     function processNumericInput() {
         if ((displaySign() + calc.displayBuffer).length < DISPLAY_BUFFER_MAX) {
-            //handle special cases 0, . ± 
-            switch (inputData) {
 
-                case "dot":
-                    // if it dot doesn't already exist, add it.
-                    if (!(calc.displayBuffer.includes("."))) {
-                        calc.displayBuffer += ".";
+
+            // it may be multi char because of the clipboard.
+            for (let c of inputData) {
+
+                //handle special cases 0, . ± 
+                switch (c) {
+
+                    case "dot": case ".":
+                        // if it dot doesn't already exist, add it.
+                        if (!(calc.displayBuffer.includes("."))) {
+                            calc.displayBuffer += ".";
+                        }
+                        break;
+
+                    case "0":
+                        // if it's a zero and there isn't already 0, add it.
+                        if (!(getDisplayValue() == 0)) {
+                            calc.displayBuffer += "0";
+                        }
+                        break;
+
+                    case "\\": case PLUS_MINUS:
+                        // if positive, invert
+                        calc.isPositive = !(calc.isPositive);
+                        break;
+                }
+                //normal number
+                let tempValue = +c;
+                if (tempValue >= 1 & tempValue <= 9) {
+                    //if currently a zero, update the display
+                    if (calc.displayBuffer != "0") {
+                        calc.displayBuffer += c;
+                    } else {
+                        calc.displayBuffer = c;
                     }
-                    break;
-
-                case "0":
-                    // if it's a zero and there isn't already 0, add it.
-                    if (!(getDisplayValue() == 0)) {
-                        calc.displayBuffer += "0";
-                    }
-                    break;
-
-                case PLUS_MINUS:
-                    // if positive, invert
-                    calc.isPositive = !(calc.isPositive);
-                    break;
-            }
-            //normal number
-            let tempValue = +inputData;
-            if (tempValue >= 1 & tempValue <= 9) {
-                //if currently a zero, update the display
-                if (calc.displayBuffer != "0") {
-                    calc.displayBuffer += inputData;
-                } else {
-                    calc.displayBuffer = inputData;
                 }
             }
         }
@@ -364,8 +370,16 @@ function calculateResult() {
 buttonList = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "dot", "plus_minus"]
 buttonList.forEach(btn => {
 
+
     document.getElementById(btn).addEventListener('click', function () {
-        inputButtonPressed(btn);
+        let btn_code = btn;
+        if (btn == 'dot') {
+            btn_code = ".";
+        }
+        else if (btn == 'plus_minus') {
+                btn_code = "\\";    
+        }
+        inputButtonPressed(btn_code);
 
     })
 })
@@ -399,13 +413,13 @@ document.getElementById("focus_object").addEventListener('keypress', (event) => 
             inputButtonPressed(event.key);
             break;
         case '.':
-            inputButtonPressed("dot");
+            inputButtonPressed(".");
             break;
         case "+":
             operatorPressed("plus");
             break;
         case "\\":
-            inputButtonPressed("plus_minus");
+            inputButtonPressed("\\");
             break;
         case '*':
             operatorPressed("multiply");
@@ -435,8 +449,48 @@ document.getElementById("focus_object").addEventListener('keydown', (event) => {
             clearPressed("backspace");
             break;
 
+
     }
 })
+
+function handleFocus() {
+    document.getElementById("focus_object").focus();
+}
+
+document.getElementById("focus_object").addEventListener('blur', (event) => {
+   handleFocus();
+})
+
+document.body.addEventListener("keydown", function (ev) {
+  
+    // function to check the detection
+    ev = ev || window.event;  // Event object 'ev'
+    var key = ev.key.toLowerCase(); // Detecting keyCode
+      
+    // Detecting Ctrl
+    var ctrl = ev.ctrlKey ? ev.ctrlKey : ((key === 17)
+        ? true : false);
+  
+    // If key pressed is V and if ctrl is true.
+    if (key == 'v' && ctrl) {
+        
+        navigator.clipboard.readText().then((clipText) => {
+        
+        parsedValue = Number(clipText);
+
+        if (!(parsedValue === NaN)) {
+            inputButtonPressed(clipText)
+        }
+    })
+    }
+    else if (key == 'c' && ctrl) {
+  
+        // If key pressed is C and if ctrl is true.
+        // print in console.
+        navigator.clipboard.writeText(String(calc.displayBuffer))
+    }
+  
+}, false);
 
 
 updateDisplay();
