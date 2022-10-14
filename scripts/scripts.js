@@ -130,48 +130,49 @@ function operatorPressed(operator) {
                 break;
             }
 
-            //if we are still entering the first operand and we get an operator, then we can
-            //move the state to the next state and finalize the first operand.
-            case (STATE_OPERAND_1):
+        //if we are still entering the first operand and we get an operator, then we can
+        //move the state to the next state and finalize the first operand.
+        case (STATE_OPERAND_1):
 
-                //if not equals, finalize operand one
-                if (operator != OPERATOR_EQUALS) {
-                    calc.currentState = STATE_OPERATOR;
-                    calc.currentOperator = operator;
-                    calc.currentOperand1_value = getDisplayValue();
-                    resetDisplayValue();
-                    break;
-                }
-                // its an equals sign, we ignore????
-                else {
-                    break;
-                }
+            //if not equals, finalize operand one
+            if (operator != OPERATOR_EQUALS) {
+                calc.currentState = STATE_OPERATOR;
+                calc.currentOperator = operator;
+                calc.currentOperand1_value = getDisplayValue();
+                resetDisplayValue();
+                break;
+            }
+            // its an equals sign, we ignore????
+            else {
+                break;
+            }
 
-                // we are entering operand 2 and get an operator.
-                case (STATE_OPERAND_2):
+        // we are entering operand 2 and get an operator.
+        case (STATE_OPERAND_2):
 
-                    if (operator == OPERATOR_EQUALS) {
+            if (operator == OPERATOR_EQUALS) {
 
-                        calculateResult();
-                        calc.currentState = STATE_EQUALS;
+                calculateResult();
+                calc.currentState = STATE_EQUALS;
 
-                    }
-                    // it's another operator, treat it like equals, but then place into the operand state
-                    else {
-                        calculateResult();
-                        resetForContinue(operator);
-                        break;
-                    }
-                    case (STATE_EQUALS):
-                        if (operator == OPERATOR_EQUALS) {
-                            //do nothing
-                            break;
-                        } else {
-                            // move the value of result to operand one and reset
-                            resetForContinue(operator);
-                            break;
+            }
+            // it's another operator, treat it like equals, but then place into the operand state
+            else {
+                calculateResult();
+                resetForContinue(operator);
+                break;
+            }
+            
+        case (STATE_EQUALS):
+            if (operator == OPERATOR_EQUALS) {
+                //do nothing
+                break;
+            } else {
+                // move the value of result to operand one and reset
+                resetForContinue(operator);
+                break;
 
-                        }
+            }
     }
 
     updateDisplay();
