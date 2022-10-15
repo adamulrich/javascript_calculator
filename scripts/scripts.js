@@ -17,8 +17,6 @@ const STATE_OPERAND_2 = 3;
 const STATE_EQUALS = 4
 const DISPLAY_BUFFER_MAX = 12;
 
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-
 const operators = {
     equals: "=",
     plus: "+",
@@ -30,25 +28,21 @@ const operators = {
 
 class CalculatorState {
 
-    constructor(displayBuffer,
-        currentState,
-        currentOperand1_value,
-        currentOperand2_value,
-        currentOperator,
-        currentResult,
-        isPositive) {
+    constructor() {
 
-        this.displayBuffer = displayBuffer;
-        this.currentState = currentState;
-        this.currentOperand1_value = currentOperand1_value;
-        this.currentOperand2_value = currentOperand2_value;
-        this.currentOperator = currentOperator;
-        this.currentResult = currentResult;
-        this.isPositive = isPositive;
+        this.displayBuffer = "0";
+        this.currentState = STATE_OPERAND_1;
+        this.currentOperand1_value = 0;
+        this.currentOperand2_value = 0;
+        this.currentOperator = "";
+        this.currentResult = 0;
+        this.isPositive = true;
+
     }
 }
 
-const calc = new CalculatorState("0", 1, 0, 0, "", 0 , true);
+// new up calc object state store with default values.
+const calc = new CalculatorState();
 
 // define HTML elements
 const displayElement = document.getElementById("display");
@@ -130,7 +124,7 @@ function inputButtonPressed(inputData) {
     }
 }
 // when an operator button is pressed
-function operatorPressed(operator) {
+function operatorButtonPressed(operator) {
 
 
     switch (calc.currentState) {
@@ -147,7 +141,7 @@ function operatorPressed(operator) {
         case (STATE_OPERAND_1):
 
             //if not equals, finalize operand one
-            if (operator != OPERATOR_EQUALS) {
+            if ((operator != OPERATOR_EQUALS) & (calc.displayBuffer != "0")) {
                 calc.currentState = STATE_OPERATOR;
                 calc.currentOperator = operator;
                 calc.currentOperand1_value = getDisplayValue();
@@ -166,7 +160,7 @@ function operatorPressed(operator) {
 
                 calculateResult();
                 calc.currentState = STATE_EQUALS;
-
+                break;4564
             }
             // it's another operator, treat it like equals, but then place into the operand state
             else {
@@ -190,18 +184,9 @@ function operatorPressed(operator) {
     updateDisplay();
 }
 
-// when we press on operator after an equals operation
-function resetForContinue(operator) {
-    calc.currentOperand1_value = calc.currentResult;
-    calc.currentOperator = operator;
-    resetDisplayValue();
-    calc.currentState = STATE_OPERATOR;
-    calc.currentOperand2_value = 0;
-    calc.currentResult = 0;
-}
 
 // handler for pressing a clear, all clear or backspace
-function clearPressed(clearInput) {
+function clearButtonPressed(clearInput) {
 
     // when the ALL clear button is pressed, delete the current buffer, reset all state
     if (clearInput === ALL_CLEAR) {
@@ -263,14 +248,22 @@ function clearPressed(clearInput) {
     updateDisplay();
 }
 
+// when we press on operator after an equals operation
+function resetForContinue(operator) {
+    //move result to operand_1 and set the operator to the new operator
+    // then set the 
+    resetState(calc.currentResult, operator, STATE_OPERATOR)
+        
+}
+
 
 // reset the state of our object and UI to default
-function resetState() {
-    calc.currentState = STATE_OPERAND_1;
-    calc.currentOperand1_value = 0;
+function resetState(operand_1 = 0, operator = '', state = STATE_OPERAND_1) {
+    calc.currentOperand1_value = operand_1;
+    calc.currentOperator = operator;
+    calc.currentState = state;
     calc.currentOperand2_value = 0;
     calc.currentResult = 0;
-    calc.currentOperator = '';
     resetDisplayValue();
 }
 
@@ -287,9 +280,6 @@ function updateDisplay() {
     displayResult.innerText = formatNumberOutput(calc.currentResult).substring(0, 12);
     displayOperator.innerText = calc.currentOperator;
     
-    //set `focus` to our focus object
-    document.getElementById("focus_object").focus();
-
 }
 
 
@@ -325,8 +315,6 @@ function getDisplayValue() {
 function resetDisplayValue() {
     calc.displayBuffer = "0";
     calc.isPositive = true;
-    //set focus to focus obect
-    document.getElementById("focus_object").focus();
 }
 
 function calculateResult() {
@@ -365,7 +353,7 @@ buttonList2 = ["minus", "divide", "multiply", "equals", "plus"]
 buttonList2.forEach(btn => {
 
     document.getElementById(btn).addEventListener('click', function () {
-        operatorPressed(operators[btn]);
+        operatorButtonPressed(operators[btn]);
 
     })
 })
@@ -374,12 +362,12 @@ buttonList3 = ["clear", "all_clear", "backspace"]
 buttonList3.forEach(btn => {
 
     document.getElementById(btn).addEventListener('click', function () {
-        clearPressed(btn);
+        clearButtonPressed(btn);
 
     })
 })
 
-document.getElementById("focus_object").addEventListener('keypress', (event) => {
+document.body.addEventListener('keypress', (event) => {
 
     let key = event.key;
 
@@ -390,41 +378,32 @@ document.getElementById("focus_object").addEventListener('keypress', (event) => 
             break;
 
         case ['+', '-', '*', '/', '='].includes(key):
-            operatorPressed(key);
+            operatorButtonPressed(key);
             break;
         case ['Enter'].includes(key):
-            operatorPressed("=");
+            operatorButtonPressed("=");
             break;
 
         }
 })
 
-document.getElementById("focus_object").addEventListener('keydown', (event) => {
-
-    switch (event.key) {
-
-        case 'Escape':
-            clearPressed('clear')
-            break;
-        case 'Backspace': case 'Delete':
-            clearPressed("backspace");
-            break;
-    }
-})
-
-function handleFocus() {
-    document.getElementById("focus_object").focus();
-}
-
-document.getElementById("focus_object").addEventListener('blur', (event) => {
-   handleFocus();
-})
+// document.body.addEventListener('keydown', (event) => {
 
 
 // wiring up copy/paste
 document.body.addEventListener("keydown", function (ev) {
-  
-    // function to check the detection
+
+    switch (ev.key) {
+
+        case 'Escape':
+            clearButtonPressed('clear')
+            break;
+        case 'Backspace': case 'Delete':
+            clearButtonPressed("backspace");
+            break;
+        
+    }
+
     ev = ev || window.event;  // Event object 'ev'
     var key = ev.key.toLowerCase(); // Detecting keyCode
       
@@ -459,6 +438,7 @@ document.body.addEventListener("keydown", function (ev) {
   
 }, false);
 
+// clipboard notice helper function
 function displayCopyNotice() {
     const notice = document.getElementById("copy_notice");
     notice.classList.toggle("elementToFadeInAndOut");
@@ -466,5 +446,7 @@ function displayCopyNotice() {
 
 }
 
+
+//update the display the first time through.
 updateDisplay();
 

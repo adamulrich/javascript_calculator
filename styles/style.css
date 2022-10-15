@@ -28,13 +28,6 @@ main {
 
 }
 
-/* .input_button:focus , 
-.operator_button:focus, 
-.control_button:focus {
-    
-    background-color: antiquewhite;
-} */
-
 .input_button:active , 
 .operator_button:active, 
 .control_button:active {
@@ -83,12 +76,6 @@ main {
     background-color: black;
 }
 
-button#focus_object {
-    height: 0px;
-    width: 0px;
-    margin-left: -100px;
-}
-
 #copy_notice {
     display: none;
     width:200px;
@@ -98,7 +85,7 @@ button#focus_object {
 	top: 30px;
 	left: 125px;
     border-radius: 1em;
-	background: radial-gradient(#eee, #4567aa);
+	background: aquamarine;
 	border: 1px solid #000;
 	padding: 0.5rem;
 	box-shadow: 0 0 30px #333;
