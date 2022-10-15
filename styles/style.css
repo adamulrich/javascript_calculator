@@ -89,3 +89,30 @@ button#focus_object {
     margin-left: -100px;
 }
 
+#copy_notice {
+    display: none;
+    width:200px;
+    text-align: center;
+    font-size: larger;
+    position: absolute;
+	top: 30px;
+	left: 125px;
+    border-radius: 1em;
+	background: radial-gradient(#eee, #4567aa);
+	border: 1px solid #000;
+	padding: 0.5rem;
+	box-shadow: 0 0 30px #333;
+	opacity: 1;
+ 
+   
+}
+
+.elementToFadeInAndOut {
+    -webkit-animation: fadeinout 1.5S linear forwards;
+    animation: fadeinout 1.5s linear forwards;
+}
+
+@keyframes fadeinout {
+  100% { opacity: 0; }
+  0%, 75% { opacity: 1; }
+}

@@ -1,11 +1,11 @@
 
 
 // create globals
-const OPERATOR_EQUALS = 'equals';
-const OPERATOR_PLUS = 'plus';
-const OPERATOR_MINUS = 'minus';
-const OPERATOR_MULTIPLY = 'multiply';
-const OPERATOR_DIVIDE = 'divide';
+const OPERATOR_EQUALS = '=';
+const OPERATOR_PLUS = '+';
+const OPERATOR_MINUS = '-';
+const OPERATOR_MULTIPLY = '*';
+const OPERATOR_DIVIDE = '/';
 const CLEAR = 'clear';
 const ALL_CLEAR = 'all_clear'
 const BACKSPACE = 'backspace';
@@ -16,6 +16,17 @@ const STATE_OPERATOR = 2;
 const STATE_OPERAND_2 = 3;
 const STATE_EQUALS = 4
 const DISPLAY_BUFFER_MAX = 12;
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+
+const operators = {
+    equals: "=",
+    plus: "+",
+    divide: "/",
+    minus: "-",
+    multiply: "*"
+}
+
 
 class CalculatorState {
 
@@ -37,7 +48,7 @@ class CalculatorState {
     }
 }
 
-const calc = new CalculatorState("0", 1, 0, 0, 0, 0 , true);
+const calc = new CalculatorState("0", 1, 0, 0, "", 0 , true);
 
 // define HTML elements
 const displayElement = document.getElementById("display");
@@ -51,27 +62,28 @@ function inputButtonPressed(inputData) {
 
     switch (calc.currentState) {
 
+        // if operand state, just fall through and process
         case STATE_OPERAND_1:
         case STATE_OPERAND_2:
 
-            processNumericInput();
             break;
 
+        //if we started entering numbers, and we are in operator state,
+        //move along to operand2 state
         case STATE_OPERATOR:
-
-            //if we started entering numbers, and we are in operator state, move along to operand2 state
+            
             calc.currentState = STATE_OPERAND_2;
-            processNumericInput();
             break;
 
-
+        // reset state and start taking numbers back in operand_1 state
         case STATE_EQUALS:
             resetState();
-            processNumericInput();
             break;
 
     }
 
+    // in all cases, we process and update
+    processNumericInput();
     updateDisplay();
 
     function processNumericInput() {
@@ -254,7 +266,6 @@ function clearPressed(clearInput) {
 
 // reset the state of our object and UI to default
 function resetState() {
-    calc.currentOperator = 0;
     calc.currentState = STATE_OPERAND_1;
     calc.currentOperand1_value = 0;
     calc.currentOperand2_value = 0;
@@ -274,7 +285,7 @@ function updateDisplay() {
     displayOperand1.innerText = formatNumberOutput(calc.currentOperand1_value);
     displayOperand2.innerText = formatNumberOutput(calc.currentOperand2_value);
     displayResult.innerText = formatNumberOutput(calc.currentResult).substring(0, 12);
-    displayOperator.innerText = getCurrentOperator();
+    displayOperator.innerText = calc.currentOperator;
     
     //set `focus` to our focus object
     document.getElementById("focus_object").focus();
@@ -314,29 +325,8 @@ function getDisplayValue() {
 function resetDisplayValue() {
     calc.displayBuffer = "0";
     calc.isPositive = true;
-    //set focus to something else
+    //set focus to focus obect
     document.getElementById("focus_object").focus();
-
-}
-
-function getCurrentOperator() {
-    let result = ""
-    switch (calc.currentOperator) {
-        case OPERATOR_DIVIDE:
-            result = "/";
-            break;
-        case OPERATOR_MINUS:
-            result = "-";
-            break;
-            break;
-        case OPERATOR_PLUS:
-            result = "+";
-            break;
-        case OPERATOR_MULTIPLY:
-            result = "*";
-            break;
-    }
-    return result
 }
 
 function calculateResult() {
@@ -344,33 +334,20 @@ function calculateResult() {
     calc.currentOperand2_value = getDisplayValue();
     let result = 0
 
-    switch (calc.currentOperator) {
-        case OPERATOR_DIVIDE:
-            result = calc.currentOperand1_value / calc.currentOperand2_value;
-            break;
-        case OPERATOR_MINUS:
-            result = calc.currentOperand1_value - calc.currentOperand2_value;
-            break;
-            break;
-        case OPERATOR_PLUS:
-            result = calc.currentOperand1_value + calc.currentOperand2_value;
-            break;
-        case OPERATOR_MULTIPLY:
-            result = calc.currentOperand1_value * calc.currentOperand2_value;
-            break;
-    }
-
+    // eval works great to eliminate the switch statement here for various operations.
+    result = eval(calc.currentOperand1_value.toString() + calc.currentOperator + calc.currentOperand2_value.toString());
+    
     calc.displayBuffer = String(Math.abs(result));
     calc.isPositive = (result == (Math.abs(result)));
     calc.currentResult = result;
-
 }
 
+
+// EVENT WIRING //
 
 // add events to wire up buttons to functions
 buttonList = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "dot", "plus_minus"]
 buttonList.forEach(btn => {
-
 
     document.getElementById(btn).addEventListener('click', function () {
         let btn_code = btn;
@@ -381,7 +358,6 @@ buttonList.forEach(btn => {
                 btn_code = "\\";    
         }
         inputButtonPressed(btn_code);
-
     })
 })
 
@@ -389,7 +365,7 @@ buttonList2 = ["minus", "divide", "multiply", "equals", "plus"]
 buttonList2.forEach(btn => {
 
     document.getElementById(btn).addEventListener('click', function () {
-        operatorPressed(btn);
+        operatorPressed(operators[btn]);
 
     })
 })
@@ -406,51 +382,33 @@ buttonList3.forEach(btn => {
 document.getElementById("focus_object").addEventListener('keypress', (event) => {
 
     let key = event.key;
-    switch (key) {
 
-        //
-        case '0': case '1': case '2': case '3': case '4': 
-        case '5': case '6': case '7': case '8': case '9':
-            inputButtonPressed(event.key);
-            break;
-        case '.':
-            inputButtonPressed(".");
-            break;
-        case "+":
-            operatorPressed("plus");
-            break;
-        case "\\":
-            inputButtonPressed("\\");
-            break;
-        case '*':
-            operatorPressed("multiply");
-            break;
-        case '/':
-            operatorPressed("divide");
-            break;
-        case '-':
-            operatorPressed("minus");
-            break;
-        case '=': case 'Enter':
-            operatorPressed("equals");
+    switch (true) {
+
+        case ['0', '1','2','3','4','5','6','7','8','9',"\\",'.'].includes(key):
+            inputButtonPressed(key);
             break;
 
-    }
+        case ['+', '-', '*', '/', '='].includes(key):
+            operatorPressed(key);
+            break;
+        case ['Enter'].includes(key):
+            operatorPressed("=");
+            break;
+
+        }
 })
 
 document.getElementById("focus_object").addEventListener('keydown', (event) => {
 
     switch (event.key) {
 
-        //
         case 'Escape':
             clearPressed('clear')
             break;
         case 'Backspace': case 'Delete':
             clearPressed("backspace");
             break;
-
-
     }
 })
 
@@ -462,6 +420,8 @@ document.getElementById("focus_object").addEventListener('blur', (event) => {
    handleFocus();
 })
 
+
+// wiring up copy/paste
 document.body.addEventListener("keydown", function (ev) {
   
     // function to check the detection
@@ -480,7 +440,7 @@ document.body.addEventListener("keydown", function (ev) {
         parsedValue = Number(clipText);
 
         if (!(parsedValue === NaN)) {
-            inputButtonPressed(clipText)
+            inputButtonPressed(clipText);
         }
     })
     }
@@ -488,11 +448,23 @@ document.body.addEventListener("keydown", function (ev) {
   
         // If key pressed is C and if ctrl is true.
         // print in console.
-        navigator.clipboard.writeText(String(calc.displayBuffer))
+        navigator.clipboard.writeText(String(calc.displayBuffer));
+
+        // we have to hack around not having a timer event. we call this, and reset the state
+        // then we call it again immediately. This plays the animation.
+        const notice = document.getElementById("copy_notice");
+        displayCopyNotice();
+        setTimeout(displayCopyNotice,0)
     }
   
 }, false);
 
+function displayCopyNotice() {
+    const notice = document.getElementById("copy_notice");
+    notice.classList.toggle("elementToFadeInAndOut");
+    notice.style.display = "block";
+
+}
 
 updateDisplay();
 
