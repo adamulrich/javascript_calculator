@@ -1,5 +1,3 @@
-
-
 // create globals
 const OPERATOR_EQUALS = '=';
 const OPERATOR_PLUS = '+';
@@ -25,7 +23,6 @@ const operators = {
     multiply: "*"
 }
 
-
 class CalculatorState {
 
     constructor() {
@@ -37,7 +34,6 @@ class CalculatorState {
         this.currentOperator = "";
         this.currentResult = 0;
         this.isPositive = true;
-
     }
 }
 
@@ -73,7 +69,6 @@ function inputButtonPressed(inputData) {
         case STATE_EQUALS:
             resetState();
             break;
-
     }
 
     // in all cases, we process and update
@@ -82,7 +77,6 @@ function inputButtonPressed(inputData) {
 
     function processNumericInput() {
         if ((displaySign() + calc.displayBuffer).length < DISPLAY_BUFFER_MAX) {
-
 
             // it may be multi char because of the clipboard.
             for (let c of inputData) {
@@ -123,9 +117,9 @@ function inputButtonPressed(inputData) {
         }
     }
 }
+
 // when an operator button is pressed
 function operatorButtonPressed(operator) {
-
 
     switch (calc.currentState) {
 
@@ -162,6 +156,7 @@ function operatorButtonPressed(operator) {
                 calc.currentState = STATE_EQUALS;
                 break;4564
             }
+
             // it's another operator, treat it like equals, but then place into the operand state
             else {
                 calculateResult();
@@ -177,7 +172,6 @@ function operatorButtonPressed(operator) {
                 // move the value of result to operand one and reset
                 resetForContinue(operator);
                 break;
-
             }
     }
 
@@ -192,8 +186,8 @@ function clearButtonPressed(clearInput) {
     if (clearInput === ALL_CLEAR) {
         // reset state
         resetState();
-
     }
+
     // when the clear button is pressed, delete the current buffer
     // reset some state
     else if (clearInput === CLEAR) {
@@ -224,23 +218,29 @@ function clearButtonPressed(clearInput) {
                     break;
             }
         }
-    } else if (clearInput === BACKSPACE) {
+    } 
+    
+    else if (clearInput === BACKSPACE) {
 
         switch (calc.currentState) {
+
             case STATE_OPERAND_1:
             case STATE_OPERAND_2:
-                if (calc.displayBuffer != "0") {
 
+                if (calc.displayBuffer != "0") {
                     calc.displayBuffer = calc.displayBuffer.substring(0, calc.displayBuffer.length - 1)
                 }
-                //reset it back to 0 if backed up.
+
+                //reset it back to 0 if no more chars.
                 if (calc.displayBuffer.length == 0) {
                     calc.isPositive = true;
                     calc.displayBuffer = 0;
                 }
                 break;
+
             case STATE_OPERATOR:
             case STATE_EQUALS:
+
                 //do nothing
                 break;
         }
@@ -255,7 +255,6 @@ function resetForContinue(operator) {
     resetState(calc.currentResult, operator, STATE_OPERATOR)
         
 }
-
 
 // reset the state of our object and UI to default
 function resetState(operand_1 = 0, operator = '', state = STATE_OPERAND_1) {
@@ -278,10 +277,8 @@ function updateDisplay() {
     displayOperand1.innerText = formatNumberOutput(calc.currentOperand1_value);
     displayOperand2.innerText = formatNumberOutput(calc.currentOperand2_value);
     displayResult.innerText = formatNumberOutput(calc.currentResult).substring(0, 12);
-    displayOperator.innerText = calc.currentOperator;
-    
+    displayOperator.innerText = calc.currentOperator;    
 }
-
 
 // what sign to display in the UI
 function displaySign() {
@@ -292,7 +289,8 @@ function displaySign() {
     }
 }
 
-//
+// trim the output
+// maybe someday fix this to be better.
 function formatNumberOutput(operand) {
     if (operand == 0) {
         return ""
@@ -301,6 +299,7 @@ function formatNumberOutput(operand) {
     }
 }
 
+// convert the display buffer into an actual number.
 function getDisplayValue() {
     let tempValue = 0;
     if (calc.displayBuffer.includes(".")) {
@@ -312,11 +311,13 @@ function getDisplayValue() {
 
 }
 
+// reset the display back to 0.
 function resetDisplayValue() {
     calc.displayBuffer = "0";
     calc.isPositive = true;
 }
 
+// calculate the result from the operands and operator
 function calculateResult() {
 
     calc.currentOperand2_value = getDisplayValue();
@@ -330,10 +331,11 @@ function calculateResult() {
     calc.currentResult = result;
 }
 
-
 // EVENT WIRING //
 
-// add events to wire up buttons to functions
+// add events to wire up input buttons
+// we cant use some symbols as id's for buttons, so we have to translate 
+// for dot and plus_minus
 buttonList = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "dot", "plus_minus"]
 buttonList.forEach(btn => {
 
@@ -349,6 +351,8 @@ buttonList.forEach(btn => {
     })
 })
 
+
+// add events to wire up operator GUI buttons
 buttonList2 = ["minus", "divide", "multiply", "equals", "plus"]
 buttonList2.forEach(btn => {
 
@@ -358,6 +362,7 @@ buttonList2.forEach(btn => {
     })
 })
 
+// add events to wire up clear/backspace GUI buttons
 buttonList3 = ["clear", "all_clear", "backspace"]
 buttonList3.forEach(btn => {
 
@@ -367,6 +372,8 @@ buttonList3.forEach(btn => {
     })
 })
 
+
+// wire up keyboard to body
 document.body.addEventListener('keypress', (event) => {
 
     let key = event.key;
@@ -380,6 +387,7 @@ document.body.addEventListener('keypress', (event) => {
         case ['+', '-', '*', '/', '='].includes(key):
             operatorButtonPressed(key);
             break;
+
         case ['Enter'].includes(key):
             operatorButtonPressed("=");
             break;
@@ -387,10 +395,7 @@ document.body.addEventListener('keypress', (event) => {
         }
 })
 
-// document.body.addEventListener('keydown', (event) => {
-
-
-// wiring up copy/paste
+// wiring up keydown for copy/paste and for clear keys that don't generate a key on keypress
 document.body.addEventListener("keydown", function (ev) {
 
     switch (ev.key) {
@@ -398,6 +403,7 @@ document.body.addEventListener("keydown", function (ev) {
         case 'Escape':
             clearButtonPressed('clear')
             break;
+
         case 'Backspace': case 'Delete':
             clearButtonPressed("backspace");
             break;
@@ -414,10 +420,13 @@ document.body.addEventListener("keydown", function (ev) {
     // If key pressed is V and if ctrl is true.
     if (key == 'v' && ctrl) {
         
+        // get promise from clipboard.
         navigator.clipboard.readText().then((clipText) => {
         
+        //really get clipboard and see if it is a number
         parsedValue = Number(clipText);
 
+        // if it is a number then process it.
         if (!(parsedValue === NaN)) {
             inputButtonPressed(clipText);
         }
@@ -425,10 +434,10 @@ document.body.addEventListener("keydown", function (ev) {
     }
     else if (key == 'c' && ctrl) {
   
-        // If key pressed is C and if ctrl is true.
-        // print in console.
+        // put it on the clipboard
         navigator.clipboard.writeText(String(calc.displayBuffer));
 
+        // display clipboard notice.
         // we have to hack around not having a timer event. we call this, and reset the state
         // then we call it again immediately. This plays the animation.
         const notice = document.getElementById("copy_notice");
@@ -445,7 +454,6 @@ function displayCopyNotice() {
     notice.style.display = "block";
 
 }
-
 
 //update the display the first time through.
 updateDisplay();
