@@ -15,7 +15,7 @@ const STATE_OPERAND_2 = 3;
 const STATE_EQUALS = 4
 const DISPLAY_BUFFER_MAX = 12;
 
-const operators = {
+const OPERATORS = {
     equals: "=",
     plus: "+",
     divide: "/",
@@ -46,7 +46,7 @@ const displayOperand1 = document.getElementById("operand_1");
 const displayOperand2 = document.getElementById("operand_2");
 const displayOperator = document.getElementById("operator");
 const displayResult = document.getElementById("result");
-
+const displayFocusElement = document.getElementById("focus_element")
 // handles numeric input
 function inputButtonPressed(inputData) {
 
@@ -123,7 +123,7 @@ function operatorButtonPressed(operator) {
 
     switch (calc.currentState) {
 
-        //if we get two operators in a row, update the operator as long as it isn't an equals sign.
+        //if we get two OPERATORS in a row, update the operator as long as it isn't an equals sign.
         case (STATE_OPERATOR):
             if (operator != OPERATOR_EQUALS) {
                 calc.currentOperator = operator;
@@ -151,10 +151,9 @@ function operatorButtonPressed(operator) {
         case (STATE_OPERAND_2):
 
             if (operator == OPERATOR_EQUALS) {
-
                 calculateResult();
                 calc.currentState = STATE_EQUALS;
-                break;4564
+                break;
             }
 
             // it's another operator, treat it like equals, but then place into the operand state
@@ -167,8 +166,10 @@ function operatorButtonPressed(operator) {
         case (STATE_EQUALS):
             if (operator == OPERATOR_EQUALS) {
                 //do nothing
-                break;
-            } else {
+                break;     
+            } 
+            
+            else {
                 // move the value of result to operand one and reset
                 resetForContinue(operator);
                 break;
@@ -196,8 +197,8 @@ function clearButtonPressed(clearInput) {
         if (calc.displayBuffer == "0") {
             resetState();
         }
-        else
-        {
+
+        else {
             // reset the buffer
             resetDisplayValue();
 
@@ -277,7 +278,12 @@ function updateDisplay() {
     displayOperand1.innerText = formatNumberOutput(calc.currentOperand1_value);
     displayOperand2.innerText = formatNumberOutput(calc.currentOperand2_value);
     displayResult.innerText = formatNumberOutput(calc.currentResult).substring(0, 12);
-    displayOperator.innerText = calc.currentOperator;    
+    displayOperator.innerText = calc.currentOperator; 
+
+    //we have to remove focus from where it is at, and place it somewhere
+    // we don't care about. if we don't, when we hit enter, whatever
+    // ui element had focus last will get processed.
+    displayFocusElement.focus();   
 }
 
 // what sign to display in the UI
@@ -357,7 +363,7 @@ buttonList2 = ["minus", "divide", "multiply", "equals", "plus"]
 buttonList2.forEach(btn => {
 
     document.getElementById(btn).addEventListener('click', function () {
-        operatorButtonPressed(operators[btn]);
+        operatorButtonPressed(OPERATORS[btn]);
 
     })
 })
