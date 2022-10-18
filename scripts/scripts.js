@@ -235,7 +235,7 @@ function clearButtonPressed(clearInput) {
                 //reset it back to 0 if no more chars.
                 if (calc.displayBuffer.length == 0) {
                     calc.isPositive = true;
-                    calc.displayBuffer = 0;
+                    calc.displayBuffer = "0";
                 }
                 break;
 
